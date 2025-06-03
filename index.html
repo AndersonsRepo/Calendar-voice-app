@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Calendar Assistant</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .mic-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            font-size: 40px;
+            cursor: pointer;
+            margin: 20px;
+            transition: all 0.3s ease;
+        }
+        .mic-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        .mic-button.listening {
+            background: #ff4757;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .status {
+            margin: 20px 0;
+            font-size: 18px;
+            min-height: 50px;
+        }
+        .response {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗓️ Voice Calendar Assistant</h1>
+        <p>Tap the microphone and speak your calendar command</p>
+        
+        <button class="mic-button" id="micButton">🎤</button>
+        
+        <div class="status" id="status">Ready to listen</div>
+        <div class="response" id="response" style="display: none;"></div>
+    </div>
+
+    <script>
+        const micButton = document.getElementById('micButton');
+        const status = document.getElementById('status');
+        const response = document.getElementById('response');
+
+        // Check if browser supports speech recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            status.textContent = 'Speech recognition not supported in this browser';
+            micButton.disabled = true;
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            micButton.addEventListener('click', startListening);
+
+            function startListening() {
+                recognition.start();
+                micButton.classList.add('listening');
+                status.textContent = 'Listening... speak now';
+                response.style.display = 'none';
+            }
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                status.textContent = `You said: "${transcript}"`;
+                micButton.classList.remove('listening');
+                
+                // Send to your n8n webhook
+                sendToWebhook(transcript);
+            };
+
+            recognition.onerror = function(event) {
+                status.textContent = 'Error occurred: ' + event.error;
+                micButton.classList.remove('listening');
+            };
+
+            recognition.onend = function() {
+                micButton.classList.remove('listening');
+            };
+
+            async function sendToWebhook(transcript) {
+                status.textContent = 'Processing...';
+                
+                const payload = {
+                    userId: 'web-user-' + Date.now(),
+                    transcript: transcript,
+                    timestamp: new Date().toISOString()
+                };
+
+                try {
+                    const webhookResponse = await fetch('https://flow.enapragma.co/webhook-test/voice-calendar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await webhookResponse.json();
+                    
+                    // Display response
+                    response.textContent = result.message || result.spokenResponse || 'Command processed';
+                    response.style.display = 'block';
+                    status.textContent = 'Ready for next command';
+
+                    // Speak the response if available
+                    if (result.spokenResponse && 'speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance(result.spokenResponse);
+                        speechSynthesis.speak(utterance);
+                    }
+
+                } catch (error) {
+                    response.textContent = 'Error: ' + error.message;
+                    response.style.display = 'block';
+                    status.textContent = 'Error occurred';
+                }
+            }
+        }
+
+        // Auto-start listening when page loads (optional)
+        window.addEventListener('load', function() {
+            // Uncomment next line to auto-start listening
+            // setTimeout(startListening, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,23 +1,91 @@
-# Voice Calendar Assistant
+# Calendar Voice App
 
-A web-based voice interface for calendar management. This application uses browser's Speech Recognition API to capture voice commands and process them through a webhook.
+A Next.js application that connects to a webhook to display calendar events. The app features a voice interface that allows users to query their calendar using natural language.
 
 ## Features
 
-- Voice command recognition
-- Natural language processing for calendar operations
-- Speech synthesis for audible responses
-- Modern, responsive UI
+- Voice-enabled interface for querying calendar events
+- Display of weekly calendar events in a clean, organized format
+- Webhook integration for fetching calendar data
+- Responsive design that works on both desktop and mobile devices
+- Dark mode support
 
-## How to Use
+## Getting Started
 
-1. Open the application in a compatible browser (Chrome recommended)
-2. Click the microphone button
-3. Speak your calendar command (e.g., "Schedule a meeting with John tomorrow at 2 PM")
-4. The system will process your request and provide a response
+### Prerequisites
 
-## Technical Details
+- Node.js 14.x or later
+- npm or yarn
 
-- Uses the Web Speech API for voice recognition and synthesis
-- Communicates with a backend service via webhook
-- Pure HTML, CSS, and JavaScript implementation
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Configure the webhook URL:
+   - Open `/pages/api/calendar.ts`
+   - Replace `https://your-webhook-url.com/calendar` with your actual webhook URL
+
+### Development
+
+Run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+### Build for Production
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+## Webhook Integration
+
+The application is designed to work with a webhook that accepts the following payload format:
+
+```json
+{
+  "sessionId": "bded18e27b064f659085802d9da651f8",
+  "action": "sendMessage",
+  "chatInput": "What do I have scheduled this week?"
+}
+```
+
+The webhook should return an array of calendar events in the following format:
+
+```json
+[
+  {
+    "id": "1",
+    "title": "Event Title",
+    "start": "2025-06-04T10:00:00-07:00",
+    "end": "2025-06-04T11:00:00-07:00",
+    "location": "Location (optional)",
+    "description": "Description (optional)"
+  }
+]
+```
+
+## Technologies Used
+
+- [Next.js](https://nextjs.org/) - React framework
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [Axios](https://axios-http.com/) - HTTP client
+- [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API) - Voice recognition
+
+## License
+
+This project is licensed under the MIT License.

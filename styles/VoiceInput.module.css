@@ -1,0 +1,110 @@
+.voiceInputContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.inputForm {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.textInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background-color: white;
+  color: var(--text-color);
+  transition: border-color 0.2s ease;
+}
+
+.textInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.voiceButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: white;
+  border: 2px solid var(--border-color);
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.voiceButton:hover {
+  background-color: var(--light-gray);
+}
+
+.voiceButton.listening {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  animation: pulse 1.5s infinite;
+}
+
+.submitButton {
+  padding: 0 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.submitButton:hover {
+  background-color: var(--secondary-color);
+}
+
+.listeningIndicator {
+  margin-top: 0.5rem;
+  text-align: center;
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  animation: blink 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .textInput {
+    background-color: #222;
+    border-color: #444;
+  }
+  
+  .voiceButton {
+    background-color: #222;
+  }
+}

@@ -27,6 +27,8 @@ npm-debug.log*
 # Build outputs
 /dist/
 /build/
+/.next/
+/out/
 
 # Local Netlify folder
 .netlify
